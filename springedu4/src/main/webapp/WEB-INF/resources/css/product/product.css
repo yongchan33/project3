@@ -1,0 +1,120 @@
+@charset "UTF-8";
+
+
+
+
+*{outline: 1px red solid;}
+
+
+body{
+  margin-top: 5em;
+  font: 20px/1.5;
+}
+
+form{margin: 1.5em;}
+
+table{border : 1px solid black;}
+
+td,th{ border: 1px solid black; padding:5px ; width: fit-content;}
+
+/* 8월7일추가*/
+
+form{margin: 1.5em;}
+
+.cgrade {padding-bottom: 5px;}
+.csize {padding-top: 5px;}
+
+
+#search {font-size: 12px;}
+
+#transaction {padding-left: 100px;}
+/* 8월7일추가*/
+
+
+.container{
+  position: relative;
+  width: 100%;
+  
+}
+.slider-container{
+  position:absolute;
+  width:100%
+}
+
+.next{display: inline-block; font-size: 5px;}
+
+.process>li{display:inline-block; font-size: 10px; padding: 10px;margin-top: 70px;}
+
+.slide{
+  position: absolute;
+  width: 100%;
+  padding: 0 20%;
+  box-sizing: border-box;
+  top:100%;
+  transform: translateY(-50%);
+  text-align: center;
+  overflow:hidden;
+}
+
+.slider-container.animated {
+ -webkit-transition: left .3s ease-in;
+ transition: left .3s ease-in;
+}
+
+
+blockquote{
+  color:#636363;
+  font-weight: 300;
+  margin-bottom: 1.5em;
+}
+
+cite{
+  font-size: .75em;
+  font-weight: 700;
+}
+
+/*Utility*/
+.simple-list{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*Nav*/
+#prev,
+#next{
+  position: absolute;
+  top:100%;
+  left:50%;
+  transform: translateY(-50%);
+  z-index: 999999;
+  display: inline-block;
+  height: 3em;
+  width: 3em;
+  border-radius: 50%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  -webkit-transition: all .3s ease-in;
+  transition: all .3s ease-in;
+}
+
+#prev.disabled, #next.disabled{display:none;}
+
+#prev{margin-left: -680px;}
+/*파일 있다면
+/* #prev{background-image: url('/arrow_left.sharp.jpg');margin-left: -680px;} */
+
+#prev:hover { color: yellowgreen}
+
+#next{ margin-left: 680px;
+}
+/* 파일 있다면
+ #next{background-image: url('/arrow_right.png'); margin-left: 680px;
+} */
+
+#next:hover{color: yellowgreen}
+
+
+
+/* 
+https://www.youtube.com/watch?v=zBVI-SKRakQ&list=PL-qMANrofLyvzqz2yYzNectJnYo5ZifE7&index=13 */

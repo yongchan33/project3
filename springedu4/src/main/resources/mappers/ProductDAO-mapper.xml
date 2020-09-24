@@ -1,0 +1,1027 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.ProductDAO-mapper">
+
+	<!-- 판매하기페이지 -->
+	<insert id="productPage"
+		parameterType="com.kh.portfolio.product.vo.ProductVO">
+
+		insert into
+		product(P_NUMBER,P_NAME,P_PURCHASE_PRICE,P_SALE_PRICE,P_BRAND,P_CONDITION,P_SIZE,P_TRANSACTION,P_ADDRESS,P_XROW,P_YCOL,P_IMG_PATH,GDSTHUMBIMG,P_M_NUMBER,CATEGORY,P_CONTENT)
+		values(PRODUCTS.nextval,#{p_name},#{p_purchase_price},#{p_sale_price},#{p_brand},#{p_condition},#{p_size},#{p_transaction},#{p_address},#{p_xrow},#{p_ycol},#{p_img_path},#{gdsThumbImg},#{memberVO.m_number},#{memberCategoryVO.c_number},#{p_content})
+		<!-- 게시글 생성후 게시글번호가 생성되고 이생성된 번호를 읽어와서 ProductVO.setP_NUMBER()에 넣어줌 -->
+
+	</insert>
+	<!-- 게시글 목록 -->
+	<select id="manlist"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t2.id as "MemberVO.id",
+		t2.m_number as"MeberVO.m_number"
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER and t1.category like '1%' and
+		t1.p_sale_condition='1'
+		order by t1.P_TIME desc
+
+	</select>
+	<!-- 상품정보 수정 -->
+	<update id="modifyproductPage" parameterType="map">
+		update product
+		set P_NAME = #{productVO.p_name},
+		P_PURCHASE_PRICE = #{productVO.p_purchase_price},
+		P_SALE_PRICE = #{productVO.p_sale_price},
+		P_BRAND = #{productVO.p_brand},
+		P_CONDITION = #{productVO.p_condition},
+		P_SIZE = #{productVO.p_size},
+		P_TRANSACTION = #{productVO.p_transaction},
+		P_ADDRESS = #{productVO.p_address},
+		P_XROW = #{productVO.p_xrow},
+		P_YCOL =#{productVO.p_ycol},
+		P_IMG_PATH = #{productVO.p_img_path},
+		CATEGORY = #{productVO.memberCategoryVO.c_number},
+		P_CONTENT = #{productVO.p_content},
+		P_TIME= systimestamp
+		where P_NUMBER = #{modifynumber}
+
+
+	</update>
+	<!-- 수정상품 조회 -->
+	<select id="getproduct" parameterType="string"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t1.P_M_NUMBER as "MemberVO.number",
+		t1.p_sale_condition,
+		t1.category as
+		"MemberCategoryVO.c_number"
+		from product t1
+		where t1.P_NUMBER = #{getproduct}
+	</select>
+
+
+	
+	<!-- 내상품목록 -->
+
+	<select id="myallproduct"
+	parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id as"MemberVO.id"
+		from (select row_number() over(
+
+		order by t1.P_TIME desc
+		) as num,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_m_number = #{m_number}
+	
+		) t1 , member t2
+
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_m_number = #{m_number}
+
+		order by t1.P_TIME desc
+
+
+	</select>
+	<!-- 내상품목록 -->
+
+	<select id="myproduct"
+	parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id as"MemberVO.id"
+		from (select row_number() over(
+
+		order by t1.P_TIME desc
+		) as num,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t2.m_number = #{m_number}
+		<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t1.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t1.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t1.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t1.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+		) t1 , member t2
+
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and num between #{startRec} and #{endRec}
+		and t2.m_number = #{m_number}
+
+		<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t1.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t1.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t1.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t1.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+		order by t1.P_TIME desc
+
+
+	</select>
+	<select id="list" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t2.id as "MemberVO.id",
+		t2.m_number as "MemberVO.m_number"
+		from (select row_number() over(
+
+
+		<if test="mlist != null">
+
+			<choose>
+				<!-- 최신순 -->
+				<when test="mlist == '1'.toString() ">
+					order by t1.P_TIME desc
+				</when>
+				<!-- 낮은가격순 -->
+				<when test="mlist == '4'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) asc
+				</when>
+				<!-- 높은가격순 -->
+				<when test="mlist == '5'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) desc
+				</when>
+			</choose>
+		</if>
+
+
+		) as num,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t1.p_sale_condition,
+		t2.id,
+		t2.m_number
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_sale_condition='1'
+		<if test="gender != null">
+			and
+			<choose>
+				<when test="gender == 'W'.toString()">
+					t1.CATEGORY like '1%'
+				</when>
+				<when test="gender == 'M'.toString()">
+					t1.CATEGORY like '2%'
+				</when>
+
+			</choose>
+		</if>
+
+
+		<if test="listCategory != null">
+			and
+			<choose>
+				<!-- 아우터 -->
+				<when test="listCategory == '11'.toString()">
+					t1.CATEGORY='11'
+				</when>
+				<when test="listCategory == '12'.toString()">
+					t1.CATEGORY='12'
+				</when>
+				<when test="listCategory == '13'.toString()">
+					t1.CATEGORY='13'
+				</when>
+				<when test="listCategory == '14'.toString()">
+					t1.CATEGORY='14'
+				</when>
+				<when test="listCategory == '15'.toString()">
+					t1.CATEGORY='15'
+				</when>
+				<when test="listCategory == '16'.toString()">
+					t1.CATEGORY='16'
+				</when>
+				<when test="listCategory == '17'.toString()">
+					t1.CATEGORY='17'
+				</when>
+				<when test="listCategory == '18'.toString()">
+					t1.CATEGORY='18'
+				</when>
+				<when test="listCategory == '19'.toString()">
+					t1.CATEGORY='19'
+				</when>
+				<when test="listCategory == '21'.toString()">
+					t1.CATEGORY='21'
+				</when>
+				<when test="listCategory == '22'.toString()">
+					t1.CATEGORY='22'
+				</when>
+				<when test="listCategory == '23'.toString()">
+					t1.CATEGORY='23'
+				</when>
+				<when test="listCategory == '24'.toString()">
+					t1.CATEGORY='24'
+				</when>
+				<when test="listCategory == '25'.toString()">
+					t1.CATEGORY='25'
+				</when>
+				<when test="listCategory == '26'.toString()">
+					t1.CATEGORY='26'
+				</when>
+				<when test="listCategory == '27'.toString()">
+					t1.CATEGORY='27'
+				</when>
+
+
+			</choose>
+
+
+		</if>
+		<if test="searchType != null">
+			<if test="keyword !=null">
+				and
+
+				<choose>
+					<!-- 제목+내용 -->
+					<when test="searchType == 'TC'.toString()">
+						(t1.p_name like '%' || #{keyword} || '%' or
+						t1.P_CONTENT like '%' || #{keyword} || '%' )
+					</when>
+					<!-- 제목 -->
+					<when test="searchType == 'T'.toString()">
+						t1.p_name like '%' || #{keyword} || '%'
+					</when>
+					<!-- 내용 -->
+					<when test="searchType == 'C'.toString()">
+						t1.P_CONTENT like '%' || #{keyword} || '%'
+					</when>
+					<!-- 아이디 -->
+					<when test="searchType == 'I'.toString()">
+						t2.id like '%' || #{keyword} || '%'
+					</when>
+					<!-- 전체 -->
+					<when test="searchType == 'A'.toString()">
+						( t1.p_name like '%' || #{keyword} || '%' or
+						t1.P_CONTENT like '%' || #{keyword} || '%' or
+						t2.id like '%' || #{keyword} || '%' )
+					</when>
+				</choose>
+			</if>
+		</if>
+
+
+
+
+
+		) t1 , member t2
+
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_sale_condition='1'
+		and num between #{startRec} and #{endRec}
+		<if test="mlist != null">
+
+			<choose>
+				<!-- 최신순 -->
+				<when test="mlist == '1'.toString() ">
+					order by t1.P_TIME desc
+				</when>
+				<!-- 낮은가격순 -->
+				<when test="mlist == '4'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) asc
+				</when>
+				<!-- 높은가격순 -->
+				<when test="mlist == '5'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) desc
+				</when>
+			</choose>
+		</if>
+
+	</select>
+	<!-- 상품 삭제 -->
+	<delete id="deleteproduct" parameterType="map">
+		delete from product where p_number = #{productnumber}
+	</delete>
+
+	
+
+	
+	<!-- 추천리스트 -->
+	<select id="recommandlist" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select 
+		t1.P_NUMBER, t1.P_NAME, t1.P_PURCHASE_PRICE, t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION, t1.P_SIZE, t1.P_TRANSACTION, t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL, t1.P_IMG_PATH, t1.GDSTHUMBIMG, t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT, t1.P_TIME, t1.id as "MemberVO.id"
+		from
+
+		(select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t2.id
+		from product t1 , member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_sale_condition='1'
+  <![CDATA[ AND ROWNUM <= 10 ]]>
+		<if test="renum!=null">
+
+			<choose>
+				<when test="renum == '1'.toString()">
+					<if test="resize!=null">
+						and
+						<choose>
+							<when test="resize == 'S'.toString()">
+								t1.P_SIZE IN('S','M')
+							</when>
+							<when test="resize == 'M'.toString()">
+								t1.P_SIZE IN('S','M','L')
+							</when>
+							<when test="resize == 'L'.toString()">
+								t1.P_SIZE IN('M','L','XL')
+							</when>
+							<when test="resize == 'XL'.toString()">
+								t1.P_SIZE IN('L','XL','XXL')
+							</when>
+							<when test="resize == 'XXL'.toString()">
+								t1.P_SIZE IN('XL','XXL')
+							</when>
+						</choose>
+					</if>
+					<if test="rebestcategory1 != null">
+
+
+						order by (case when t1.category in(#{rebestcategory1}) then 1 else 2
+						end), (case when t1.category in(#{rebestcategory2}) then 1 else 2
+						end),(case when t1.category in(#{rebestcategory3}) then 1 else 2
+						end), t1.P_TIME desc
+
+					</if>
+
+
+
+
+				</when>
+
+				<when test="renum == '2'.toString()">
+					<if test="resize!=null">
+						and
+						<choose>
+							<when test="resize == 'S'.toString()">
+								t1.P_SIZE IN('S','M')
+							</when>
+							<when test="resize == 'M'.toString()">
+								t1.P_SIZE IN('S','M','L')
+							</when>
+							<when test="resize == 'L'.toString()">
+								t1.P_SIZE IN('M','L','XL')
+							</when>
+							<when test="resize == 'XL'.toString()">
+								t1.P_SIZE IN('L','XL','XXL')
+							</when>
+							<when test="resize == 'XXL'.toString()">
+								t1.P_SIZE IN('XL','XXL')
+							</when>
+						</choose>
+					</if>
+					<if test="rebestcategory1 != null">
+
+
+						order by (case when t1.category in(#{rebestcategory2}) then 1 else 2
+						end), (case when t1.category in(#{rebestcategory1}) then 1 else 2
+						end),(case when t1.category in(#{rebestcategory3}) then 1 else 2
+						end), t1.P_TIME desc
+
+					</if>
+				</when>
+
+				<when test="renum == '3'.toString()">
+					<if test="resize!=null">
+						and
+						<choose>
+							<when test="resize == 'S'.toString()">
+								t1.P_SIZE IN('S','M')
+							</when>
+							<when test="resize == 'M'.toString()">
+								t1.P_SIZE IN('S','M','L')
+							</when>
+							<when test="resize == 'L'.toString()">
+								t1.P_SIZE IN('M','L','XL')
+							</when>
+							<when test="resize == 'XL'.toString()">
+								t1.P_SIZE IN('L','XL','XXL')
+							</when>
+							<when test="resize == 'XXL'.toString()">
+								t1.P_SIZE IN('XL','XXL')
+							</when>
+						</choose>
+					</if>
+					<if test="rebestcategory1 != null">
+
+
+						order by (case when t1.category in(#{rebestcategory3}) then 1 else 2
+						end),(case when t1.category in(#{rebestcategory1}) then 1 else 2
+						end),(case when t1.category in(#{rebestcategory2}) then 1 else 2
+						end), t1.P_TIME desc
+					</if>
+				</when>
+
+				<when test="renum == '4'.toString()">
+
+					<if test="rebestcategory1 != null">
+
+
+						order by (case when t1.category
+						in(#{rebestcategory1},#{rebestcategory2},#{rebestcategory3}) then
+						1 else 2 end), t1.P_TIME desc
+
+					</if>
+				</when>
+
+			</choose>
+		</if>
+		) t1
+		order by DBMS_RANDOM.RANDOM()
+
+	</select>
+	<!-- 게시글 총 레코드 수 -->
+	<select id="totalRecordCount" resultType="int">
+		select count(*) as totalRecCnt
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+
+	</select>
+
+	<!-- 내 상품 게시글 총 레코드 수 -->
+	<select id="mysearchedTotalRecordCount" parameterType="map"
+		resultType="int">
+
+		select count(*) as totalRecCnt
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		
+		and t2.m_number = #{m_number}
+		
+		<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t1.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t1.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t1.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t1.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+		order by t1.P_TIME desc
+
+	</select>
+
+
+
+	<!-- 내 거래 게시글 총 레코드 수 -->
+	<select id="mytransTotalRecordCount" parameterType="map"
+		resultType="int">
+
+		select count(*) as totalRecCnt
+		from request t1 left outer join 
+transaction t4 on t1.r_number= t4.t_r_number , member t2 , product t3
+where t1.r_member=t2.m_number
+and t1.r_p_number = t3. p_number
+and t2.m_number = #{m_number}
+	<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t3.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t3.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t3.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t3.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+	order by t1.r_time desc
+
+	</select>
+
+
+	<!-- 요청 게시글 총 레코드 수 -->
+	<select id="reqsearchedTotalRecordCount" parameterType="map"
+		resultType="int">
+
+		select count(*) as totalRecCnt
+		from member t2,request t3, product t1
+		where t3.r_member = t2.m_number and t1.p_number = t3.r_p_number
+		and t1.p_m_number = #{m_number}
+		and t1.p_sale_condition='1'
+		and t3.r_condition='1'
+		order by t3.r_time desc
+
+	</select>
+
+	<!-- 요청 게시글 총 레코드 수 -->
+	<select id="transsearchedTotalRecordCount" parameterType="map"
+		resultType="int">
+
+		select count(*) as totalRecCnt
+		from product t1, member t2, request t3, transaction t4
+		where t1.p_number = t3.r_p_number
+		and t1.p_m_number = t2.m_number
+		and t3.r_number = t4.t_r_number
+		and t3.r_member = #{m_number}
+		and	t1.p_sale_condition='2'
+		order by t4.t_time desc
+
+	</select>
+	
+	<!-- 관심상품 게시글 총 레코드 수 -->
+	<select id="baskettotalRecordCount" parameterType="map"
+		resultType="int">
+
+		select count(*) as totalRecCnt
+		from product t1, member t2, basket t3
+		where t1.P_NUMBER = t3.b_p_number 
+		and	t2.m_number = t3.b_m_number
+		and t1.p_sale_condition='1'
+		and t3.b_m_number = #{m_number}
+
+	</select>
+		<!-- 관심상품 체크 리스트 -->
+	<select id="basketchecklist" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select t1.p_number
+		from product t1, member t2, basket t3
+		where t1.P_NUMBER = t3.b_p_number 
+		and	t2.m_number = t3.b_m_number
+		and t1.p_sale_condition='1'
+		and t3.b_m_number = #{m_number}
+
+	</select>
+	
+	<!-- 게시글 총 레코드 수 -->
+
+	<select id="searchedTotalRecordCount" parameterType="map"
+		resultType="int">
+		select count(*) as totalRecCnt
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_sale_condition='1'
+		<if test="gender!=null">
+			and
+			<choose>
+				<when test="gender == 'W'.toString()">
+					t1.CATEGORY like '1%'
+				</when>
+				<when test="gender == 'M'.toString()">
+					t1.CATEGORY like '2%'
+				</when>
+
+			</choose>
+		</if>
+		<if test="listCategory != null">
+			and
+			<choose>
+				<!-- 아우터 -->
+				<when test="listCategory == '11'.toString()">
+					t1.CATEGORY='11'
+				</when>
+				<when test="listCategory == '12'.toString()">
+					t1.CATEGORY='12'
+				</when>
+				<when test="listCategory == '13'.toString()">
+					t1.CATEGORY='13'
+				</when>
+				<when test="listCategory == '14'.toString()">
+					t1.CATEGORY='14'
+				</when>
+				<when test="listCategory == '15'.toString()">
+					t1.CATEGORY='15'
+				</when>
+				<when test="listCategory == '16'.toString()">
+					t1.CATEGORY='16'
+				</when>
+				<when test="listCategory == '17'.toString()">
+					t1.CATEGORY='17'
+				</when>
+				<when test="listCategory == '18'.toString()">
+					t1.CATEGORY='18'
+				</when>
+				<when test="listCategory == '19'.toString()">
+					t1.CATEGORY='19'
+				</when>
+				<when test="listCategory == '21'.toString()">
+					t1.CATEGORY='21'
+				</when>
+				<when test="listCategory == '22'.toString()">
+					t1.CATEGORY='22'
+				</when>
+				<when test="listCategory == '23'.toString()">
+					t1.CATEGORY='23'
+				</when>
+				<when test="listCategory == '24'.toString()">
+					t1.CATEGORY='24'
+				</when>
+				<when test="listCategory == '25'.toString()">
+					t1.CATEGORY='25'
+				</when>
+				<when test="listCategory == '26'.toString()">
+					t1.CATEGORY='26'
+				</when>
+				<when test="listCategory == '27'.toString()">
+					t1.CATEGORY='27'
+				</when>
+
+			</choose>
+
+
+		</if>
+		<if test="searchType != null">
+			<if test="keyword !=null">
+				and
+				<choose>
+					<!-- 제목+내용 -->
+					<when test="searchType == 'TC'.toString()">
+						t1.p_name like '%' || #{keyword} || '%' or
+						t1.P_CONTENT like '%' || #{keyword} || '%'
+					</when>
+					<!-- 제목 -->
+					<when test="searchType == 'T'.toString()">
+						t1.p_name like '%' || #{keyword} || '%'
+					</when>
+					<!-- 내용 -->
+					<when test="searchType == 'C'.toString()">
+						t1.P_CONTENT like '%' || #{keyword} || '%'
+					</when>
+					<!-- 아이디 -->
+					<when test="searchType == 'I'.toString()">
+						t2.id like '%' || #{keyword} || '%'
+					</when>
+					<!-- 전체 -->
+					<when test="searchType == 'A'.toString()">
+						t1.p_name like '%' || #{keyword} || '%' or
+						t1.P_CONTENT like '%' || #{keyword} || '%' or
+						t2.id like '%' || #{keyword} || '%'
+					</when>
+				</choose>
+			</if>
+		</if>
+		<if test="mlist != null">
+
+			<choose>
+				<!-- 최신순 -->
+				<when test="mlist == '1'.toString() ">
+					order by t1.P_TIME desc
+				</when>
+				<!-- 낮은가격순 -->
+				<when test="mlist == '4'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) asc
+				</when>
+				<!-- 높은가격순 -->
+				<when test="mlist == '5'.toString() ">
+					order by TO_NUMBER(t1.P_SALE_PRICE) desc
+				</when>
+			</choose>
+		</if>
+	</select>
+	<!-- 상세페이지 -->
+	<select id="productInfo" parameterType="long"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.p_sale_condition,
+		t1.P_M_NUMBER,
+		t1.CATEGORY as "MemberCategoryVO.c_number",
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t2.id as "MemberVO.id",
+		t2.m_number as "MemberVO.m_number"
+		
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER
+		and t1.p_number = #{p_number}
+
+
+	</select>
+	<!-- 지도로보기 -->
+	<select id="maplist"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME,
+		t2.id as "MemberVO.id"
+		from product t1, member t2
+		where t1.P_M_NUMBER = t2.M_NUMBER and t1.p_sale_condition='1'
+
+
+	</select>
+	<!-- 장바구니 중복확인 -->
+	<select id="basketcheck" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.BasketVO">
+		select b_number,b_p_number,b_m_number from basket where
+		b_p_number=#{basketproduct} and b_m_number=#{m_number}
+	</select>
+	<!-- 관심상품 등록 -->
+	<insert id="basketin" parameterType="map">
+		insert into basket(b_number,b_p_number,b_m_number)
+		values(BASKETS.nextval,#{basketproduct},#{m_number})
+	</insert>
+	<!-- 관심상품 해제 -->
+	<delete id="basketout" parameterType="map">
+		delete from basket where b_p_number = #{basketproduct} and b_m_number =
+		#{m_number}
+	</delete>
+
+
+<!-- 관심상품 리스트 -->
+	<select id="basketlist" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id as "MemberVO.id"
+		from (select row_number() over(
+
+		order by t1.P_TIME desc
+		) as num,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id
+		from product t1, member t2, basket t3
+		where t1.P_NUMBER = t3.b_p_number 
+		and t2.m_number = t3.b_m_number
+		and t1.p_sale_condition='1'
+		and t3.b_m_number = #{m_number}
+		) t1 , member t2, basket t3
+		where  t1.P_NUMBER = t3.b_p_number 
+		and	t2.m_number = t3.b_m_number
+		and num between #{startRec} and #{endRec}
+		and t1.p_sale_condition='1'
+		and t3.b_m_number = #{m_number}
+		order by t1.P_TIME desc
+
+
+	</select>
+	<!-- 후기페이지 총 레코드 갯수 -->
+		<select id="reviewtotalRecordCount" resultType="int">
+		select count(*) as totalRecCnt
+	from product t1, member t2,review t3
+		where  t1.p_sale_condition='3'
+		and t3.re_p_number= t1.p_number
+		and t1.p_m_number = t2.m_number
+
+	</select>
+</mapper>

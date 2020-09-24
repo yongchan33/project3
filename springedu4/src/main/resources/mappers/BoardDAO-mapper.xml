@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.BoardDAO-mapper">
+
+<!-- 게시글 목록 -->
+<select id="faq"
+				resultType="com.kh.portfolio.board.vo.FaqVO">
+				
+	 select f_number,
+	 		f_title,
+	 		f_content
+	 from FAQ
+	 
+ 
+</select>
+
+ <insert id="review"
+		parameterType="com.kh.portfolio.transaction.vo.ReviewVO">
+		insert into review(re_number,re_m_number,re_p_number,grade1,grade2,re_content,re_img_path)
+		values(REVIEWS.nextval,#{re_m_number},#{productVO.p_number},#{grade1},#{grade2},#{re_content},#{productVO.p_img_path})
+		</insert> 
+
+<select id="relist"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select 
+		t3.grade1 as "ReviewVO.grade1",
+		t3.grade2 as "ReviewVO.grade2",
+		t3.re_content as "ReviewVO.re_content",
+		t3.re_time as "ReviewVO.re_time",
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id as "MemberVO.id",
+		t2.m_number as "MemberVO.m_number"
+		from (select row_number() over(
+
+		order by t1.P_TIME desc
+		) as num,
+		t3.grade1,
+		t3.grade2,
+		t3.re_content,
+		t3.re_time,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id,
+		t2.m_number
+		from product t1, member t2,review t3
+		where  t1.p_sale_condition='3'
+		and t3.re_p_number= t1.p_number
+		and t1.p_m_number = t2.m_number
+		) t1 , member t2,review t3
+		where  num between #{startRec} and #{endRec}
+		and t1.p_sale_condition='3'
+		and t3.re_p_number= t1.p_number
+		and t1.p_m_number = t2.m_number
+		order by t1.P_TIME desc
+</select>		
+<select id="myrelist"
+parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+		select 
+		t3.grade1 as "ReviewVO.grade1",
+		t3.grade2 as "ReviewVO.grade2",
+		t3.re_content as "ReviewVO.re_content",
+		t3.re_time as "ReviewVO.re_time",
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id as "MemberVO.id",
+		t2.m_number as "MemberVO.m_number"
+		from (select row_number() over(
+
+		order by t3.RE_TIME desc
+		) as num,
+		t3.grade1,
+		t3.grade2,
+		t3.re_content,
+		t3.re_time,
+		t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_sale_condition,
+		t1.P_TIME,
+		t2.id,
+		t2.m_number
+		from product t1, member t2,review t3
+		where  t1.p_sale_condition='3'
+		and t3.re_p_number= t1.p_number
+		and t1.p_m_number = t2.m_number
+		) t1 , member t2,review t3
+		where t1.p_sale_condition='3'
+		and t2.m_number=#{m_number}
+		and t3.re_p_number= t1.p_number
+		and t1.p_m_number = t2.m_number
+		order by t3.RE_TIME desc
+</select>			
+</mapper>
+

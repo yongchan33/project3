@@ -1,0 +1,28 @@
+@charset "EUC-KR";
+
+#boardList .paging div.active {
+    background-color: black;
+    width: 30px;
+    height: 20px;
+    text-align: center;
+    /* border: 1px solid; */
+    color:white;
+}
+
+#boardList .paging {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+    margin-top:50px;
+}
+
+#boardList .paging div {
+    padding: 2px;
+    width: 30px;
+    height: 20px;
+    text-align: center;
+}
+.active a {
+    text-decoration: none;
+    color: white;
+}

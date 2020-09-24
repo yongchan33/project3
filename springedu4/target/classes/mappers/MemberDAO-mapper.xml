@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.MemberDAO-mapper">
+<!-- 	회원 등록 -->
+<insert id="joinMember"
+				parameterType="com.kh.portfolio.member.vo.MemberVO">
+<!-- 		insert into member(m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3)
+		       values(MEMBERS.nextval,#{id},#{pw},#{tel},#{name},#{gender},#{address},#{birth},#{height},#{weight},#{email},#{category1},#{category2},#{category3}) -->
+		       	insert into member(m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3,m_size)
+		       values(MEMBERS.nextval,#{id},#{pw},#{tel},#{name},#{gender},#{address},#{birth},#{height},#{weight},#{email},#{category1},#{category2},#{category3},#{m_size})
+
+</insert>
+<!-- 	회원 수정 -->
+<update id="modifyMember"
+				parameterType="com.kh.portfolio.member.vo.MemberVO">
+		update member
+		   set tel 			= #{tel},
+		       address 	= #{address},
+		       gender 		= #{gender},
+		       udate 		= systimestamp,
+		       height 		= #{height},
+		       weight 		= #{weight},
+		       email        = #{email},
+		       category1 		= #{category1},
+		       category2 		= #{category2},
+		       category3 		= #{category3},
+		       m_size           = #{m_size}
+
+		 where id 			= #{id}
+</update>
+
+<!-- 	회원 전체조회 -->
+<select id="listAllMember"
+				resultType="com.kh.portfolio.member.vo.MemberVO">
+	
+	select m_number,
+		id,
+		pw,
+		tel,
+		name,
+		gender,
+		address,
+		birth,
+		height,
+		weight,
+		email,
+		category1,
+		category2,
+		category3,
+		m_grade1,
+		m_grade2,
+		m_size,
+		quantitiy,
+		m_lock,
+		m_level
+		  from member
+</select>
+
+
+<!-- 	회원 개별조회 -->
+<select id="listOneMember"
+				parameterType="string"
+				resultType="com.kh.portfolio.member.vo.MemberVO">
+	select  m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3,m_size,m_grade1,m_grade2,quantitiy,m_level,m_lock
+	  from  member 
+	 where  id = #{id} 
+</select>
+<!-- 	회원 탈퇴 -->
+<delete id="outMember"
+				parameterType="map">
+	delete from member where id = #{id} and pw = #{pw}
+</delete>
+<!-- 	로그인 -->
+<select id="login"
+				parameterType="map"
+				resultType="com.kh.portfolio.member.vo.MemberVO">
+	select  m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3,m_size,sessionKey,sessionLimit
+	  from  member 
+	 where  id = #{id} 
+	   and  pw = #{pw} 
+</select>
+
+  <!--   로그인된 경우 해당 세션id와 유효시간을 사용자 테이블에 세팅한다.    -->
+<update id="keepLogin" parameterType="map">
+        update member set sessionKey = #{sessionId}, sessionLimit = #{next} where id = #{id}
+</update>
+<!-- 	판매자 평점, 상품평점, 판매수량 1증가 -->
+<update id="reviewsellerevaluation" parameterType="map">
+         update member set  QUANTITIY=to_char(to_number(QUANTITIY)+1) ,
+ m_grade1 = to_char(to_number(#{evaluation1})+to_number(m_grade1)) ,
+ m_grade2 = to_char(to_number(#{evaluation2})+to_number(m_grade2)) 
+ where m_number = #{m_number}
+</update>
+<!-- 판매수량 1증가 -->
+<update id="sellerquntityplus" parameterType="map">
+         update member set  QUANTITIY=to_char(to_number(QUANTITIY)+1)
+ where m_number = #{m_number}
+</update>
+    <!--
+        유효기간이 남아 있으면서 해당 sessionId를 가지는 사용자 정보를 꺼내오는 부분
+     -->
+<select id="checkUserWithSessionKey"
+				parameterType="string"
+				resultType="com.kh.portfolio.member.vo.MemberVO"
+				>
+        	select  m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3,m_size,sessionKey,sessionLimit
+	  from  member  where sessionKey = #{sessionId} and sessionLimit > sysdate
+    </select>
+
+<!-- 	아이디 찾기 -->
+<select id="findID"
+				parameterType="com.kh.portfolio.member.vo.MemberVO"
+				resultType="string">
+	select id 
+	  from member 
+	 where name   = #{name} 
+	   and email = #{email} 
+</select>
+<!-- 	비밀번호 찾기 -->
+<select id="findPW"
+				parameterType="com.kh.portfolio.member.vo.MemberVO"
+				resultType="string">
+	select pw
+	  from member
+	 where id    = #{id}
+	   and email   = #{email}
+</select>
+<!-- 	비밀번호 변경 -->
+<update id="changePW"
+				parameterType="map">
+	update member 
+ 		 set pw = #{postpw} 
+ 		   
+ 	 where id = #{id}				
+ 	   and pw = #{prepw}	
+ 	   			
+</update>
+<!-- 	아이디 중복 체크 -->
+<select id="checkID"
+				parameterType="string"
+				resultType="com.kh.portfolio.member.vo.MemberVO"
+				>
+	select M_NUMBER,ID,PW,TEL,NAME,GENDER,ADDRESS,BIRTH,CDATE,UDATE,HEIGHT,WEIGHT,
+EMAIL,CATEGORY1,CATEGORY2,CATEGORY3,M_GRADE1,M_GRADE2,QUANTITIY,
+M_SIZE,M_LOCK,M_LEVEL 
+	  from  member 
+	 where  id = #{id} 
+</select>
+<!-- 	이메일 중복 체크 -->
+<select id="checkEmail"
+				parameterType="string"
+				resultType="com.kh.portfolio.member.vo.MemberVO"
+				>
+	select M_NUMBER,
+	ID,
+	PW,
+	TEL,
+	NAME,
+	GENDER,
+	ADDRESS,
+	BIRTH,
+	CDATE,
+	UDATE,
+	HEIGHT,
+	WEIGHT,
+EMAIL,
+CATEGORY1,
+CATEGORY2,
+CATEGORY3,
+M_GRADE1,
+M_GRADE2,
+QUANTITIY,
+M_SIZE,
+M_LOCK,
+M_LEVEL 
+	  from  member 
+	 where  email = #{email} 
+</select>
+<update id="changelock" parameterType="map">
+update member
+set m_lock = #{m_lock}
+where id =  #{id}
+</update>
+
+
+<select id="checkadmin"
+				parameterType="map"
+				resultType="com.kh.portfolio.member.vo.MemberVO"
+				>
+select  m_number,id,pw,tel,name,gender,address,birth,height,weight,email,category1,category2,category3,m_size,m_grade1,m_grade2,quantitiy
+	  from  member 
+	 where id=#{id} and m_level='100'
+</select>
+</mapper>
+
+
+
+
+
+
+

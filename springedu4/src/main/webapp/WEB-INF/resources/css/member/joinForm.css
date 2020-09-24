@@ -1,0 +1,110 @@
+@charset "EUC-KR";
+
+	main .container .content form{
+		width: 80%;
+		margin: 50px auto;
+	}
+ .container > .content h1{
+    text-align: left;
+   	font-size :24px;
+   	margin : 20px;
+  }
+
+  .container > .content h2{
+	margin-left: 5px;
+    font-weight: lighter;
+   font-size : 20px;
+   padding-bottom:10px;
+  }
+ .container > .content #h3{
+ float:right;
+color: #AB3E55;
+    font-weight: lighter;
+   font-size : 12px;
+    padding-bottom:5px;
+  }
+   .container > .content #h4{
+color: #AB3E55;
+margin-right: 5px;
+   font-size : 10px;
+   
+  }
+	main .container .content form ul {
+		list-style: none;
+	}
+	main .container .content form ul #w_clothes  {
+    display: flex;
+	}
+  main .container .content form ul #m_clothes  {
+    display: flex;
+	}
+  fieldset{
+  
+    margin : 5px;
+  }
+  
+	main .container .content form .insertBtn{
+		
+		width:100px;
+		padding:3px;
+		font-size : 15px;
+
+		height:50px;
+		margin : 10px;
+		
+	}
+	main form .err{
+		color:#AB3E55;
+		font-size : 0.7em;
+		font-weight: bold;
+	}
+	
+	.menu_name{
+	
+   margin-bottom : 2px;
+   margin-top :10px;
+   font_size: 12px;
+  
+ }
+ .menu_name2{
+   font-size: 20px;
+   margin-bottom : 7px;
+   margin-top :10px;
+ }
+ #cate_msg{
+ color:#AB3E55;
+		font-size : 0.7em;
+		font-weight: bold;
+ }
+ .check_c{
+ margin-right : 10px;
+ margin-bottom : 3px;}
+ #sample4_detailAddress{
+ width:400px;}
+ 
+ .address{
+ margin-bottom : 2px;}
+ 
+ .btnli{
+ display:flex;
+		justify-content:center;
+		margin-top : 30px;
+		}
+ #postcode, #extraAddress{
+ margin-bottom:5px;}
+ 
+ th{
+ width:200px;
+ background-color : #FBFBFB;
+ }
+ 
+ .btn{
+ height:25px;
+ font-size:12px;
+ line-height:12.5px;
+ margin-bottom:5px;}
+ 
+ #detailAddress{
+width:250px; 
+margin-top:5px;
+}

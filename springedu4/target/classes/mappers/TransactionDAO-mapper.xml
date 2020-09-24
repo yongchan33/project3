@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.TransactionDAO-mapper">
+
+	<!-- 구매요청 -->
+	<insert id="request"
+		parameterType="com.kh.portfolio.transaction.vo.RequestVO">
+		insert into request(R_NUMBER,R_P_NUMBER,R_MEMBER,R_CONTENT)
+		values(REQUESTS.nextval,#{productVO.p_number},#{r_member},#{r_content})
+	</insert>
+
+	<!-- 구매요청리스트 -->
+	<select id="rlist" parameterType="map"
+		resultType="com.kh.portfolio.transaction.vo.RequestVO">
+		select t1.p_name as "productVO.p_name",
+		t2.id as "memberVO.id",
+		t3.r_number,
+		t3.r_content,
+		t3.r_time,
+		t3.R_CONDITION,
+		t3.R_CHECK,
+		t3.r_member,
+		t1.p_img_path as "productVO.p_img_path"
+
+		from (select row_number() over(
+
+		order by t3.r_time desc
+		) as num,
+		t1.p_name,
+		t2.id,
+		t3.r_number,
+		t3.r_content,
+		t3.r_time,
+		t3.R_CONDITION,
+		t3.R_CHECK,
+		t3.r_member,
+		t3.r_p_number,
+		t1.p_img_path
+		from member t2,request t3, product t1
+		where t3.r_member = t2.m_number and t1.p_number = t3.r_p_number
+		and t1.p_m_number = #{m_number}
+		and t1.p_sale_condition='1'
+		and t3.r_condition='1'
+		) t3 , product t1, member t2
+
+		where t3.r_member = t2.m_number and t1.p_number = t3.r_p_number
+		and num between #{startRec} and #{endRec}
+		and t1.p_m_number = #{m_number}
+		and t1.p_sale_condition='1'
+		and t3.r_condition='1'
+		order by t3.r_time desc
+	</select>
+	<!-- 거래요청리스트 -->
+	<select id="tlist" parameterType="map"
+		resultType="com.kh.portfolio.transaction.vo.TransactionVO">
+
+		select t4.t_number ,
+		t2.id as "memberVO.id",
+		t1.p_name as "productVO.p_name",
+		t4.t_content,
+		t4.t_time,
+		t1.p_number as "productVO.p_number",
+		t1.p_img_path as "productVO.p_img_path"
+
+		from( select row_number() over(
+
+		order by t4.t_time desc
+		) as num,
+		t4.t_number,
+		t2.id,
+		t1.p_name,
+		t4.t_content,
+		t4.t_time,
+		t4.t_r_number,
+		t1.p_number,
+		t1.p_img_path
+		from product t1, member t2, request t3, transaction t4
+		where t1.p_number = t3.r_p_number
+		and t1.p_m_number = t2.m_number
+		and t3.r_number = t4.t_r_number
+		and t3.r_member = #{m_number}
+		and
+		t1.p_sale_condition='2') t4, product t1, member t2, request t3
+
+		where t1.p_number = t3.r_p_number
+		and t1.p_m_number = t2.m_number
+		and t3.r_number = t4.t_r_number
+		and num between #{startRec} and #{endRec}
+		and t3.r_member = #{m_number}
+		and t1.p_sale_condition='2'
+
+		order by t4.t_time desc
+	</select>
+
+	<!-- 거래요청 -->
+	<insert id="transaction" parameterType="map">
+		<!-- transactionVO,requestnumber -->
+		insert into transaction(T_NUMBER,T_R_NUMBER,T_CONTENT)
+		values(TRANSACTIONS.nextval,#{requestnumber},#{t_content})
+	</insert>
+
+	<!-- 후기작성 -->
+	<insert id="review"
+		parameterType="com.kh.portfolio.transaction.vo.ReviewVO">
+		insert into
+		review(re_number,re_m_number,re_p_number,grade1,grade2,re_content,re_img_path)
+		values(REVIEWS.nextval,#{re_m_number},#{productVO.p_number},#{grade1},#{grade2},#{re_content},#{productVO.p_img_path})
+	</insert>
+
+
+
+	<!-- 상품 거래 수락 후 거래중으로 변경 -->
+	<update id="updatecondition" parameterType="map">
+		update product
+		set p_sale_condition='2'
+
+		where p_number =(select r_p_number from request where
+		r_number=#{requestnumber})
+	</update>
+
+	<!-- 거래요청 상태변경('1' 대기 -> '2' 수락) -->
+	<update id="allowreqest" parameterType="map">
+		update request
+		set r_condition='2'
+		where r_number = #{requestnumber}
+	</update>
+
+	<!-- 상품 거래 취소 후 판매중으로 변경 -->
+	<update id="deletetransaction" parameterType="map">
+		update product
+		set p_sale_condition='1'
+
+		where p_number =#{productnumber}
+	</update>
+	<!-- 거래상태변경(대기중'1'-> 거절'3') -->
+	<update id="utctransaction" parameterType="map">
+		update transaction
+		set t_condition='3'
+		where t_r_number =(select r_number from request where
+		r_p_number=#{productnumber})
+	</update>
+	<!-- 거래상태변경(대기중'1'-> 완료'2') -->
+	<update id="finishtcondition" parameterType="map">
+		update transaction
+		set t_condition='2'
+		where t_r_number =(select r_number from request where
+		r_p_number=#{productnumber} and r_member=#{m_number} and
+		r_condition='2')
+	</update>
+	<!-- 상품상태변경(판매중'1'-> 판매완료'3') -->
+	<update id="transactionfinish" parameterType="map">
+		update product
+		set p_sale_condition='3'
+		where p_number = #{productnumber}
+
+	</update>
+
+	<!-- 구매 수락시 동일상품 요청거절 -->
+	<update id="canclesamerequest" parameterType="map">
+		update request
+		set r_condition='3'
+		where r_p_number =(select r_p_number from request where
+		r_number=#{requestnumber} ) and r_condition='1'
+
+
+	</update>
+	<!-- 구매 요청 거절 -->
+	<delete id="canclerequest" parameterType="map">
+		update request
+		set r_condition='3'
+		where r_number = #{requestnumber}
+	</delete>
+
+
+	<select id="mytransaction"
+		resultType="com.kh.portfolio.transaction.vo.RequestVO">
+		select t1.r_check,
+		t1.r_condition,
+		t1.r_content,
+		t1.r_member,
+		t1.r_number,
+		t1.r_p_number,
+		t1.r_time,
+		t2.id as "MeberVO.id",
+		t3.p_name as "ProductVO.p_name",
+		t3.p_sale_condition as "ProductVO.p_sale_condition",
+		t3.p_number as "ProductVO.p_number",
+		t3.p_img_path as "ProductVO.p_img_path",
+		t4.t_content as "TransactionVO.t_content"
+		from (select row_number() over(
+
+		order by t1.r_time desc
+		) as num,
+		t1.r_check,
+		t1.r_condition,
+		t1.r_content,
+		t1.r_member,
+		t1.r_number,
+		t1.r_p_number,
+		t1.r_time,
+		t2.id,
+		t3.p_name,
+		t3.p_sale_condition,
+		t3.p_number,
+		t3.p_img_path,
+		t4.t_content
+		from request t1 left outer join
+		transaction t4 on t1.r_number= t4.t_r_number , member t2 , product t3
+		where t1.r_member=t2.m_number
+		and t1.r_p_number = t3. p_number
+		and t2.m_number = #{m_number}
+		<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t3.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t3.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t3.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t3.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+		) t1 left outer join
+		transaction t4 on t1.r_number= t4.t_r_number , member t2 , product t3
+		where t1.r_member=t2.m_number
+		and t1.r_p_number = t3. p_number
+		and t2.m_number = #{m_number}
+		<if test="trsstate != null">
+			and
+			<choose>
+				<!-- 전체보기 -->
+				<when test="trsstate == '1'.toString()">
+					t3.P_sale_condition IN('1','2','3')
+				</when>
+				<!-- 판매중 -->
+				<when test="trsstate == '2'.toString()">
+					t3.P_sale_condition IN('1')
+				</when>
+				<!-- 거래중 -->
+				<when test="trsstate == '3'.toString()">
+					t3.P_sale_condition IN('2')
+				</when>
+				<!-- 구매완료 -->
+				<when test="trsstate == '4'.toString()">
+					t3.P_sale_condition IN('3')
+				</when>
+
+			</choose>
+		</if>
+		order by t1.r_time desc
+	</select>
+	<!-- 요청 중복체크 -->
+	<select id="checkrequest" parameterType="map"
+		resultType="com.kh.portfolio.transaction.vo.RequestVO">
+select r_number,r_p_number,r_member,r_time,r_content,r_condition,r_check  
+from request 
+where r_p_number=#{p_number} and r_member=#{m_number}
+and r_condition IN('1','2')
+	</select>
+	
+	<!-- 회원탈퇴시 거래중상품 체크 -->
+	<select id="outmembercheck" parameterType="map"
+		resultType="com.kh.portfolio.product.vo.ProductVO">
+	select 
+	t1.P_NUMBER,
+		t1.P_NAME,
+		t1.P_PURCHASE_PRICE,
+		t1.P_SALE_PRICE,
+		t1.P_BRAND,
+		t1.P_CONDITION,
+		t1.P_SIZE,
+		t1.P_TRANSACTION,
+		t1.P_ADDRESS,
+		t1.P_XROW,
+		t1.P_YCOL,
+		t1.P_IMG_PATH,
+		t1.GDSTHUMBIMG,
+		t1.P_M_NUMBER,
+		t1.CATEGORY,
+		t1.P_CONTENT,
+		t1.P_TIME
+	 from product t1 where p_m_number=#{m_number} and p_sale_condition='2'
+	</select>
+</mapper>

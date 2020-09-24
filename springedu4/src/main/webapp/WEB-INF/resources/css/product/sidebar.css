@@ -1,0 +1,22 @@
+@charset "EUC-KR";
+
+.nav{
+
+ 	border-right:1px solid lightgray;} 
+
+.nav>ul>li{padding:40px;
+
+	width:200px;
+text-align:center;
+height:40px;
+
+}
+.nav>ul>li a{
+	
+text-decoration:none;
+}
+
+.nav>ul>li a:hover{
+	color:black;
+	font-weight:bold;
+}

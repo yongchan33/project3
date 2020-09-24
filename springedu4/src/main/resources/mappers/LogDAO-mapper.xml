@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.LogDAO-mapper">
+<!-- 로그 기록 -->
+<insert id="addLog"
+					parameterType="com.kh.portfolio.log.vo.LogVO">
+	insert into LOG(L_NUMBER,L_ACTION,L_TIME,L_M_NUMBER,L_CATEGORY)
+	 values(
+	 LOGS.nextval,
+	 #{l_action},
+	 SYSTIMESTAMP,
+	 #{l_m_number},
+	 #{l_category}
+	 )
+
+</insert>
+
+<!-- 개인 로그 조회 -->
+<select id="listAllLog"
+				parameterType="string"
+				resultType="com.kh.portfolio.log.vo.LogVO">
+				
+	 select 
+				 L_NUMBER,
+				 L_ACTION,
+	 			 L_TIME,
+	 			 L_M_NUMBER,
+			 	 L_CATEGORY
+		 from LOG t1
+	  where t1.L_M_NUMBER=#{l_m_number} and L_ACTION='3'
+	  	  and t1.L_CATEGORY IS NOT NULL
+	  order by L_TIME desc
+ 
+</select>
+
+<!-- 게시글 삭제 -->
+<!-- 게시글 보기 -->
+<!-- 게시글 목록 -->
+
+</mapper>
